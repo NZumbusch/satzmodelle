@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Satzmodelle Trainer</title>
+  <style>
+    :root { --bg: #f6f4ef; --text: #1e1c19; --muted: #6c675e; --accent: #8a4b2a; --card: #fff; --line: #e0dcd2; color-scheme: light dark; }
+    @media (prefers-color-scheme: dark) { :root { --bg: #171614; --text: #ece8e1; --muted: #a39d92; --accent: #e0915f; --card: #22201d; --line: #38342f; } }
+    body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.5 system-ui, sans-serif; }
+    main { max-width: 640px; margin: 0 auto; padding: 48px 16px; }
+    .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 20px; margin-top: 24px; }
+    a.btn { display: inline-block; background: var(--accent); color: #fff; text-decoration: none; padding: 12px 18px; border-radius: 10px; font-weight: 600; }
+    .muted { color: var(--muted); font-size: 14px; }
+    code { font-size: 12px; overflow-wrap: anywhere; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Satzmodelle Trainer</h1>
+    <p>Gehörbildung mit Satzmodellen: Diminution hören, nachspielen, Hilfen erst bei Bedarf.
+      Android-App für Tablets. Lehrmaterial ist nicht enthalten; die App importiert eine eigene Bibliothek.</p>
+    <div class="card">
+      <p id="ver" class="muted">Version wird geladen …</p>
+      <a class="btn" href="android/app.apk">APK herunterladen</a>
+      <p class="muted">Installierte Apps aktualisieren sich selbst (Einstellungen → Über).</p>
+      <p class="muted">SHA-256: <code id="sha">–</code></p>
+    </div>
+  </main>
+  <script>
+    fetch('android/version.json', { cache: 'no-store' }).then((r) => r.json()).then((v) => {
+      document.getElementById('ver').textContent = `Version ${v.versionName} (${v.versionCode}), ${new Date(v.publishedAt).toLocaleString('de')}`;
+      document.getElementById('sha').textContent = v.sha256;
+    }).catch(() => { document.getElementById('ver').textContent = 'Noch keine Version veröffentlicht.'; });
+  </script>
+</body>
+</html>

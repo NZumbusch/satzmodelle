@@ -1,0 +1,66 @@
+name: Build and publish Android update
+on:
+  push: { branches: [main] }
+  workflow_dispatch:
+
+permissions: { contents: read, pages: write, id-token: write }
+concurrency: { group: pages, cancel-in-progress: false }
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs: { apk: '${{ steps.apk.outcome }}' }
+    env:
+      HAS_KEYSTORE: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
+    steps:
+      - uses: actions/checkout@v5
+        with: { fetch-depth: 0 }          # full history: versionCode = 100 + commit count
+      - name: Privacy check (nothing private in git)
+        run: python3 -I tools/privacy_check.py
+      - uses: actions/setup-node@v5
+        with: { node-version: 22, cache: npm, cache-dependency-path: app/package-lock.json }
+      - name: App checks, tests, web build
+        working-directory: app
+        run: npm ci && npm run check && npm test && npx vite build
+      - name: Page skeleton
+        run: mkdir -p _site && cp site/index.html _site/
+      - uses: actions/setup-java@v5
+        if: env.HAS_KEYSTORE == 'true'
+        with: { distribution: temurin, java-version: 21, cache: gradle }
+      - name: Build signed APK
+        id: apk
+        if: env.HAS_KEYSTORE == 'true'
+        continue-on-error: true            # the deploy job fails the run afterwards, the page still deploys
+        working-directory: app
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          export ANDROID_KEYSTORE_PATH="$RUNNER_TEMP/signing.keystore"
+          printf '%s' "$ANDROID_KEYSTORE_BASE64" | tr -d '[:space:]' | base64 --decode > "$ANDROID_KEYSTORE_PATH"
+          keytool -list -keystore "$ANDROID_KEYSTORE_PATH" -storepass "$ANDROID_KEYSTORE_PASSWORD" -alias "$ANDROID_KEY_ALIAS" > /dev/null
+          npx cap sync android
+          (cd android && chmod +x gradlew && ./gradlew assembleRelease --no-daemon --stacktrace)
+          node scripts/write-update-manifest.mjs android/app/build/outputs/apk/release/app-release.apk ../_site/android
+      - name: Remove signing key
+        if: always()
+        run: rm -f "$RUNNER_TEMP/signing.keystore"
+      - uses: actions/configure-pages@v6
+      - uses: actions/upload-pages-artifact@v5
+        with: { path: ./_site }
+
+  deploy:                                  # separate job: avoids the "no artifact" race of deploy-pages
+    needs: build
+    runs-on: ubuntu-latest
+    environment: { name: github-pages, url: '${{ steps.deployment.outputs.page_url }}' }
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5
+      - name: Fail if the APK did not build
+        if: needs.build.outputs.apk == 'failure'
+        run: |
+          echo "::error::Page deployed, but the APK build failed"
+          exit 1

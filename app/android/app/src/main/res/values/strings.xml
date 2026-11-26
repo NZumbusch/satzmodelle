@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Satzmodelle</string>
+    <string name="title_activity_main">Satzmodelle</string>
+    <string name="package_name">ch.zumbusch.satzmodelle</string>
+    <string name="custom_url_scheme">ch.zumbusch.satzmodelle</string>
+    <string name="playback_channel">Wiedergabe</string>
+    <string name="playback_playing">Wiedergabe läuft</string>
+    <string name="playback_paused">Pausiert</string>
+    <string name="playback_play">Abspielen</string>
+    <string name="playback_pause">Pause</string>
+    <string name="playback_stop">Beenden</string>
+</resources>

@@ -1,0 +1,26 @@
+name: CI
+on:
+  pull_request:
+  push:
+    branches-ignore: [main]   # main is tested by the deploy workflow
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with: { fetch-depth: 0 }
+      - name: Privacy check (nothing private in git)
+        run: python3 -I tools/privacy_check.py
+      - uses: actions/setup-python@v6
+        with: { python-version: '3.12' }
+      - run: pip install pillow && sudo apt-get install -y -qq imagemagick > /dev/null
+      - name: Library tools (synthetic data only)
+        run: |
+          python3 -I tools/test_build_library.py
+          python3 -I tools/make_demo_library.py /tmp/demo && python3 -I tools/validate_library.py /tmp/demo
+      - uses: actions/setup-node@v5
+        with: { node-version: 22, cache: npm, cache-dependency-path: app/package-lock.json }
+      - name: App checks and tests
+        working-directory: app
+        run: npm ci && npm run check && npm test && npx vite build

@@ -1,0 +1,41 @@
+# Teaching material is never part of this repository (see CLAUDE.md, tools/privacy_check.py)
+/library*/
+/demo-library/
+*.zip
+*.sib
+*.mp3
+*.m4a
+*.aif
+*.aiff
+*.wav
+*.flac
+*.ogg
+*.mp4
+*.mov
+*.flv
+*.tif
+*.tiff
+*.webp
+*.pdf
+*.musicxml
+*.mxl
+*.logicx/
+
+# Build output
+node_modules/
+dist/
+build/
+_site/
+.gradle/
+*.apk
+*.aab
+__pycache__/
+
+# Signing and local configuration
+*.keystore
+*.jks
+keystore.properties
+local.properties
+.env
+.claude/settings.local.json
+.DS_Store
