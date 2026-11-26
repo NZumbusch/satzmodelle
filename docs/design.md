@@ -13,6 +13,10 @@ follow from that and from feedback while using it on a tablet.
   comparison with the score. The solution step asks for confirmation.
 - **Self-rating instead of scoring.** "Geschafft / Teilweise / Noch nicht" is honest and fast; the
   "not yet secure" filter brings weak pieces back.
+- **Statistics stay simple and honest.** A piece is *sicher / wackelig / unsicher / neu* from its last
+  five attempts (newest weigh most, every hint used costs a little). In blind mode the statistics show
+  ids and models, not piece names. Chart colours are validated for colour-vision deficiency and always
+  come with labels.
 
 ## Player
 

@@ -9,6 +9,7 @@ app/
 │   │   ├── Practice            task player, hint ladder, recorder, rating
 │   │   ├── Player              waveform, markers, speed, transposition (one per track list)
 │   │   ├── ScoreView           MusicXML via OpenSheetMusicDisplay (lazy-loaded)
+│   │   ├── StatsScreen         statistics page (CSS/SVG-free bar charts, tap readouts)
 │   │   ├── LibraryBrowser, ModelDetail, ExerciseEditor, Settings, UpdateCard, …
 │   └── lib/                    logic, mostly framework-free and unit-tested
 └── android/                    Capacitor project; native plugins in app/src/main/java/…
@@ -45,6 +46,7 @@ Settings are small and live in `localStorage` (`lib/state.svelte.ts`).
 | `units.ts`, `syncplan.ts`, `fullsync.ts` | full sync: packs, own exercises, edits, recordings as zip units; plan with tombstones |
 | `backup.ts`, `zipwriter.ts` | backup of everything; a stored-zip writer that streaming readers can unpack |
 | `updater.ts`, `updates.svelte.ts` | self-update: manifest check, download with SHA-256, install |
+| `stats.ts` | statistics: confidence per piece (recent attempts weighted, hints cost a little), per-model summaries, hint histogram, weeks, streak (pure, tested) |
 | `i18n.ts` | all UI strings, German and English |
 
 ## Native plugins (Java, `android/app/src/main/java/…`)

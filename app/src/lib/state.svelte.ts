@@ -125,6 +125,7 @@ export type Route =
   | { name: 'library' }
   | { name: 'model'; id: string }
   | { name: 'settings' }
+  | { name: 'stats' }
   | { name: 'editor'; id?: string };
 
 export const nav = $state({ stack: [{ name: 'start' }] as Route[] });
@@ -135,7 +136,7 @@ export function go(r: Route) {
 export function replace(r: Route) {
   nav.stack[nav.stack.length - 1] = r;
 }
-export function home(name: 'start' | 'library' | 'settings' = 'start') {
+export function home(name: 'start' | 'library' | 'stats' | 'settings' = 'start') {
   nav.stack = [{ name: 'start' }];
   if (name !== 'start') nav.stack.push({ name });
 }

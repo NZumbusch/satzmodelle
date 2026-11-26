@@ -8,11 +8,12 @@
   import ImportOverlay from './components/ImportOverlay.svelte';
   import ExerciseEditor from './components/ExerciseEditor.svelte';
   import BusyOverlay from './components/BusyOverlay.svelte';
+  import StatsScreen from './components/StatsScreen.svelte';
   import { nav, back, home, reloadLibrary, settings, t } from './lib/state.svelte';
   import { initNative } from './lib/native';
 
   const route = $derived(nav.stack[nav.stack.length - 1]);
-  const tab = $derived(nav.stack.some((r) => r.name === 'settings') ? 'settings' : nav.stack.some((r) => r.name === 'library' || r.name === 'model' || r.name === 'editor') && !nav.stack.some((r) => r.name === 'practice') ? 'library' : 'start');
+  const tab = $derived(nav.stack.some((r) => r.name === 'stats') ? 'stats' : nav.stack.some((r) => r.name === 'settings') ? 'settings' : nav.stack.some((r) => r.name === 'library' || r.name === 'model' || r.name === 'editor') && !nav.stack.some((r) => r.name === 'practice') ? 'library' : 'start');
 
   $effect(() => { document.documentElement.lang = settings.lang; });
   $effect(() => {
@@ -49,6 +50,7 @@
   <nav>
     <button class="tab" class:on={tab === 'start'} onclick={() => home('start')}>{t('nav.practice')}</button>
     <button class="tab" class:on={tab === 'library'} onclick={() => home('library')}>{t('nav.library')}</button>
+    <button class="tab" class:on={tab === 'stats'} onclick={() => home('stats')}>{t('nav.stats')}</button>
     <button class="tab" class:on={tab === 'settings'} onclick={() => home('settings')}>{t('nav.settings')}</button>
   </nav>
 </header>
@@ -65,6 +67,8 @@
       <ModelDetail id={route.id} />
     {:else if route.name === 'settings'}
       <Settings />
+    {:else if route.name === 'stats'}
+      <StatsScreen />
     {:else if route.name === 'editor'}
       <ExerciseEditor id={route.id} />
     {/if}

@@ -13,6 +13,11 @@
   --mid: #b7811f;
   --bad: #b23b33;
   --shadow: rgba(0, 0, 0, 0.06);
+  /* chart status colours, validated for colour-vision deficiency (dataviz validator) */
+  --chart-good: #2f7d4f;
+  --chart-mid: #b7811f;
+  --chart-bad: #b23b33;
+  --chart-new: #d6d1c7;
   color-scheme: light;
   font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   font-size: 16px;
@@ -38,6 +43,10 @@
     --mid: #e0b04f;
     --bad: #e06b62;
     --shadow: rgba(0, 0, 0, 0.35);
+    --chart-good: #3a9466;
+    --chart-mid: #c2952a;
+    --chart-bad: #d95550;
+    --chart-new: #45413b;
     color-scheme: dark;
   }
 }
@@ -57,6 +66,10 @@
   --mid: #e0b04f;
   --bad: #e06b62;
   --shadow: rgba(0, 0, 0, 0.35);
+  --chart-good: #3a9466;
+  --chart-mid: #c2952a;
+  --chart-bad: #d95550;
+  --chart-new: #45413b;
   color-scheme: dark;
 }
 

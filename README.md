@@ -28,8 +28,9 @@ Dorico, MuseScore or Sibelius.
 - **Record your attempts** and listen back next to the original.
 - **Own exercises from MusicXML**: rendered as a score, synthesised (piano, harpsichord, organ), so any
   tempo and key works.
-- **Progress**: self-rating per exercise, history, "not yet secure" filter; pieces removed from the
-  library keep their progress.
+- **Progress and statistics**: self-rating per exercise, history, "not yet secure" filter; a statistics
+  page shows how secure each piece is, success rate, hints needed, strong and weak models, weekly
+  activity, and what to practise next. Pieces removed from the library keep their progress.
 - **Google Drive (optional)**: progress sync, full sync of library and own material, backups, all in the
   hidden app folder of your own Drive.
 - **Backups**: one file with everything, restore by merging or replacing.
