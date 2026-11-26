@@ -24,7 +24,9 @@
   let speed = $state(1);
   let volume = $state(1);
   let countIn = $state(0);
-  let more = $state(false);
+  /** small options panel (count-in, volume), opened from the sliders icon */
+  let optsOpen = $state(false);
+  let optsEl: HTMLDivElement | undefined = $state();
   /** markers of the current track; editing = "Marker setzen" toggled */
   let markers = $state<Marker[]>([]);
   let editing = $state(false);
@@ -284,7 +286,12 @@
     }
   });
 
+  function onWindowPointer(ev: PointerEvent) {
+    if (optsOpen && optsEl && !optsEl.contains(ev.target as Node)) optsOpen = false;
+  }
+
   function onKey(ev: KeyboardEvent) {
+    if (ev.key === 'Escape' && optsOpen) { optsOpen = false; return; }
     if (compact) return;
     if (ev.target instanceof HTMLInputElement || ev.target instanceof HTMLSelectElement || ev.target instanceof HTMLTextAreaElement) return;
     if (ev.code === 'Space') { ev.preventDefault(); engine?.toggle(); }
@@ -293,7 +300,7 @@
   const speeds = [0.5, 0.6, 0.7, 0.75, 0.8, 0.9, 1, 1.1, 1.25, 1.5];
 </script>
 
-<svelte:window onkeydown={onKey} />
+<svelte:window onkeydown={onKey} onpointerdown={onWindowPointer} />
 
 <div class="player" class:compact>
   {#if tracks.length > 1}
@@ -331,6 +338,29 @@
         {#if status === 'loading'}{t('player.loading')}{:else}{fmtTime(pos)} / {fmtTime(engine?.duration ?? 0)}{/if}
         {#if playState === 'counting'}<span class="counting">●</span>{/if}
       </div>
+      {#if !compact}
+        <div class="opts" bind:this={optsEl}>
+          <button class="icon optbtn" class:on={optsOpen || countIn > 0 || volume !== 1} onclick={() => (optsOpen = !optsOpen)}
+            aria-expanded={optsOpen} aria-haspopup="true" aria-label={t('player.options')} title={t('player.options')}>
+            <svg viewBox="0 0 24 24"><path d="M4 7h9.2a2.5 2.5 0 0 0 4.6 0H20v-2h-2.2a2.5 2.5 0 0 0-4.6 0H4zm0 12h3.2a2.5 2.5 0 0 0 4.6 0H20v-2h-8.2a2.5 2.5 0 0 0-4.6 0H4zm0-6h9.2a2.5 2.5 0 0 0 4.6 0H20v-2h-2.2a2.5 2.5 0 0 0-4.6 0H4z" /></svg>
+          </button>
+          {#if optsOpen}
+            <div class="panel" role="dialog" aria-label={t('player.options')}>
+              <label class="prow">
+                <span>{t('player.countIn')}</span>
+                <select bind:value={countIn}>
+                  <option value={0}>{t('player.countIn.off')}</option>
+                  {#each [1, 2, 3, 4] as n}<option value={n}>{n}</option>{/each}
+                </select>
+              </label>
+              <label class="prow">
+                <span>{t('player.volume')} <b>{Math.round(volume * 100)} %</b></span>
+                <input type="range" min="0" max="1.5" step="0.05" bind:value={volume} />
+              </label>
+            </div>
+          {/if}
+        </div>
+      {/if}
     </div>
 
     <canvas bind:this={canvas} class="wave" class:editing onpointerdown={onWavePointer} onpointermove={onWaveMove}></canvas>
@@ -394,20 +424,6 @@
           </div>
         </div>
 
-        <button class="chip morebtn" onclick={() => (more = !more)} aria-expanded={more}>{more ? t('player.less') : t('player.more')}</button>
-
-        <div class="ctl extra" class:show={more}>
-          <span class="lbl">{t('player.countIn')}</span>
-          <select bind:value={countIn}>
-            <option value={0}>{t('player.countIn.off')}</option>
-            {#each [1, 2, 3, 4] as n}<option value={n}>{n}</option>{/each}
-          </select>
-        </div>
-
-        <div class="ctl vol extra" class:show={more}>
-          <span class="lbl">{t('player.volume')}</span>
-          <input type="range" min="0" max="1.5" step="0.05" bind:value={volume} aria-label={t('player.volume')} />
-        </div>
       {/if}
     </div>
   {/if}
@@ -441,10 +457,18 @@
   .lbl b { color: var(--text); font-weight: 600; margin-left: 4px; }
   .lbl .kl { color: var(--accent); }
   .row { display: flex; gap: 6px; align-items: center; flex-wrap: nowrap; }
-  .vol input { width: 100%; max-width: 200px; min-height: 40px; }
   .muted { color: var(--muted); }
-  /* rarely used controls (count-in, volume) stay folded away behind "Mehr …" */
-  .morebtn { margin-left: auto; }
-  .extra { order: 10; }
-  .extra:not(.show) { display: none; }
+  /* rarely used options (count-in, volume) live in a small panel under the sliders icon */
+  .opts { position: relative; }
+  .optbtn { background: none; color: var(--muted); }
+  .optbtn.on { color: var(--accent); background: var(--surface-2); }
+  .panel {
+    position: absolute; right: 0; top: calc(100% + 8px); z-index: 30; width: 260px;
+    display: flex; flex-direction: column; gap: 14px; padding: 14px 16px;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 8px 24px var(--shadow);
+  }
+  .prow { display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: var(--muted); }
+  .prow b { color: var(--text); font-weight: 600; margin-left: 4px; }
+  .prow select { align-self: flex-start; }
+  .prow input { width: 100%; min-height: 32px; }
 </style>
