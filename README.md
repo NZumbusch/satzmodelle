@@ -1,4 +1,4 @@
-# Satzmodelle Trainer
+# <img src="docs/images/icon.png" alt="" width="40" align="top"> Satzmodelle Trainer
 
 An Android tablet app for ear training with **Satzmodelle** (voice-leading models such as Fauxbourdon,
 Quintfall or Parallelismus). You hear a short *Diminution*, try to play it back by ear, and only then

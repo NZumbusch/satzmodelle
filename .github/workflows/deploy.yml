@@ -23,7 +23,7 @@ jobs:
         working-directory: app
         run: npm ci && npm run check && npm test && npx vite build
       - name: Page skeleton
-        run: mkdir -p _site && cp site/index.html _site/
+        run: mkdir -p _site && cp site/index.html _site/ && cp app/public/icon.svg _site/
       - uses: actions/setup-java@v5
         if: env.HAS_KEYSTORE == 'true'
         with: { distribution: temurin, java-version: 21, cache: gradle }
