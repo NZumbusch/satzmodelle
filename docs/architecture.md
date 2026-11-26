@@ -9,7 +9,7 @@ app/
 │   │   ├── Practice            task player, hint ladder, recorder, rating
 │   │   ├── Player              waveform, markers, speed, transposition (one per track list)
 │   │   ├── ScoreView           MusicXML via OpenSheetMusicDisplay (lazy-loaded)
-│   │   ├── StatsScreen         statistics page (CSS/SVG-free bar charts, tap readouts)
+│   │   ├── StatsScreen         statistics page (plain CSS bar charts, no chart library; tap readouts)
 │   │   ├── LibraryBrowser, ModelDetail, ExerciseEditor, Settings, UpdateCard, …
 │   └── lib/                    logic, mostly framework-free and unit-tested
 └── android/                    Capacitor project; native plugins in app/src/main/java/…
