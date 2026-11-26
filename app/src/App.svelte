@@ -60,7 +60,7 @@
     {#if route.name === 'start'}
       <StartScreen />
     {:else if route.name === 'practice'}
-      <Practice ids={route.ids} />
+      <Practice ids={route.ids} srs={route.srs} />
     {:else if route.name === 'library'}
       <LibraryBrowser />
     {:else if route.name === 'model'}

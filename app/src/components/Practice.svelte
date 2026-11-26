@@ -12,8 +12,10 @@
   import { scheduleSync } from '../lib/sync.svelte';
   import type { I18nKey } from '../lib/i18n';
   import type { Rating } from '../lib/types';
+  import { srsPlan } from '../lib/session';
+  import { continueSession } from '../lib/srs';
 
-  let { ids: initialIds }: { ids: string[] } = $props();
+  let { ids: initialIds, srs = false }: { ids: string[]; srs?: boolean } = $props();
 
   let ids = $state(untrack(() => [...initialIds]));
   let idx = $state(0);
@@ -87,6 +89,19 @@
     revealed = 0;
   }
 
+  /** spaced repetition: what "Weiter üben" would bring now (due, then new, then the oldest) */
+  const nextSrs = $derived(finished && srs ? continueSession(srsPlan(lib.models, lib.catMap, lib.progress, settings.filter)) : null);
+
+  function continueSrs() {
+    if (!nextSrs?.ids.length) return;
+    ids = nextSrs.ids;
+    idx = 0;
+    results = {};
+    revealed = 0;
+    finished = false;
+    window.scrollTo({ top: 0 });
+  }
+
   async function end() {
     await reloadLibrary();
     back();
@@ -101,10 +116,16 @@
 
 {#if finished}
   <section class="card center">
-    <h2>{t('practice.done')}</h2>
+    <h2>{srs ? t('srs.doneToday') : t('practice.done')}</h2>
     <p>{t('practice.summary', counts)}</p>
     <div class="row">
-      <button class="btn primary" onclick={again}>{t('practice.again')}</button>
+      {#if srs}
+        {#if nextSrs?.ids.length}
+          <button class="btn primary" onclick={continueSrs}>{t(`srs.continue.${nextSrs.kind}`, { n: nextSrs.ids.length })}</button>
+        {/if}
+      {:else}
+        <button class="btn primary" onclick={again}>{t('practice.again')}</button>
+      {/if}
       <button class="btn" onclick={end}>{t('practice.end')}</button>
     </div>
   </section>

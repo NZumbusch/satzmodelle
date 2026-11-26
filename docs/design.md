@@ -13,6 +13,12 @@ follow from that and from feedback while using it on a tablet.
   comparison with the score. The solution step asks for confirmation.
 - **Self-rating instead of scoring.** "Geschafft / Teilweise / Noch nicht" is honest and fast; the
   "not yet secure" filter brings weak pieces back.
+- **Spaced repetition is one option of the order, not a separate mode.** The filter chooses the pool;
+  "Wiederholung" chooses what comes up today: all due pieces with up to five new ones mixed in. After
+  that, "Weiter üben" brings the remaining new pieces, and once everything has been practised, the
+  pieces practised longest ago. The schedule (SM-2 style: 1 day, 3 days, then × ease; "Noch nicht"
+  resets, "Teilweise" barely grows, hints shrink the step) is computed from the rating history, so
+  nothing extra is stored or synced.
 - **Statistics stay simple and honest.** A piece is *sicher / wackelig / unsicher / neu* from its last
   five attempts (newest weigh most, every hint used costs a little). In blind mode the statistics show
   ids and models, not piece names. Chart colours are validated for colour-vision deficiency and always

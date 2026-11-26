@@ -172,7 +172,8 @@ export interface Filter {
   tempo: Tempo | 'any';
   warmups: boolean;
   practice: 'all' | 'new' | 'weak';
-  order: 'random' | 'library';
+  /** srs = spaced repetition: due pieces first, new ones mixed in (see srs.ts) */
+  order: 'random' | 'library' | 'srs';
 }
 
 export const DEFAULT_FILTER: Filter = {

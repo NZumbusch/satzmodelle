@@ -121,7 +121,7 @@ export async function reloadLibrary() {
 
 export type Route =
   | { name: 'start' }
-  | { name: 'practice'; ids: string[] }
+  | { name: 'practice'; ids: string[]; srs?: boolean }
   | { name: 'library' }
   | { name: 'model'; id: string }
   | { name: 'settings' }

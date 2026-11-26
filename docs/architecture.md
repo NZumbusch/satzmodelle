@@ -46,6 +46,7 @@ Settings are small and live in `localStorage` (`lib/state.svelte.ts`).
 | `units.ts`, `syncplan.ts`, `fullsync.ts` | full sync: packs, own exercises, edits, recordings as zip units; plan with tombstones |
 | `backup.ts`, `zipwriter.ts` | backup of everything; a stored-zip writer that streaming readers can unpack |
 | `updater.ts`, `updates.svelte.ts` | self-update: manifest check, download with SHA-256, install |
+| `srs.ts`, `session.ts` | spaced repetition: schedule from the rating history, today's session (due + new mixed), continue (new, then oldest) (pure, tested) |
 | `stats.ts` | statistics: confidence per piece (recent attempts weighted, hints cost a little), per-model summaries, hint histogram, weeks, streak (pure, tested) |
 | `i18n.ts` | all UI strings, German and English |
 

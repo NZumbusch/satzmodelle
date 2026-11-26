@@ -18,7 +18,8 @@ Dorico, MuseScore or Sibelius.
 
 ## Features
 
-- **Start screen as a filter**: models, difficulty, tempo variant, only new or not yet secure, random order.
+- **Start screen as a filter**: models, difficulty, tempo variant, only new or not yet secure, random order,
+  or **spaced repetition** (Anki-style): pieces come back when they are due, new ones are mixed in.
 - **Hint ladder**: key → opening → degrees → skeleton → score → original and piece. Order and steps are
   configurable; blind mode hides even the model's name until the end.
 - **Player for practising by ear**: speed 50–150 % without changing pitch, transposition (exact for

@@ -3,6 +3,8 @@
   import { lib, settings, saveSettings, t, go } from '../lib/state.svelte';
   import { runImport } from '../lib/importUi.svelte';
   import UpdateCard from './UpdateCard.svelte';
+  import { srsPlan } from '../lib/session';
+  import { NEW_PER_SESSION, continueSession, todaysSession } from '../lib/srs';
   import { showBanner } from '../lib/updates.svelte';
   import type { Tempo } from '../lib/types';
 
@@ -15,7 +17,11 @@
     return m;
   });
   const cats = $derived(lib.categories.filter((c) => perCategory.has(c.id)));
-  const matching = $derived(lib.models.filter((m) => matchesFilter(m, settings.filter, lib.catMap, lib.progress.get(m.id))));
+  const srs = $derived(settings.filter.order === 'srs');
+  const matching = $derived(lib.models.filter((m) =>
+    matchesFilter(m, srs ? { ...settings.filter, practice: 'all' } : settings.filter, lib.catMap, lib.progress.get(m.id))));
+  const srsP = $derived(srs ? srsPlan(lib.models, lib.catMap, lib.progress, settings.filter) : null);
+  const srsNew = $derived(srsP ? Math.min(srsP.fresh.length, NEW_PER_SESSION) : 0);
 
   function toggleCat(id: string) {
     const all = cats.map((c) => c.id);
@@ -33,6 +39,13 @@
   }
 
   function start() {
+    if (srsP) {
+      // today's reviews with a few new pieces; if nothing is due: continue with new / oldest
+      let ids = todaysSession(srsP);
+      if (!ids.length) ids = continueSession(srsP).ids;
+      if (ids.length) go({ name: 'practice', ids, srs: true });
+      return;
+    }
     const ids = buildSession(matching, f.order);
     if (ids.length) go({ name: 'practice', ids });
   }
@@ -108,6 +121,7 @@
         </div>
       </div>
 
+      {#if !srs}
       <div class="field">
         <span class="lbl">{t('filter.practice')}</span>
         <div class="row seg">
@@ -116,11 +130,12 @@
           {/each}
         </div>
       </div>
+      {/if}
 
       <div class="field">
         <span class="lbl">{t('filter.order')}</span>
         <div class="row seg">
-          {#each ['random', 'library'] as const as o}
+          {#each ['srs', 'random', 'library'] as const as o}
             <button class="chip" class:on={f.order === o} onclick={() => { f.order = o; upd(); }}>{t(`filter.order.${o}`)}</button>
           {/each}
         </div>
@@ -132,7 +147,11 @@
       </label>
 
       <div class="go">
-        <span class="muted">{matching.length === 1 ? t('filter.count1') : t('filter.count', { n: matching.length })}</span>
+        {#if srsP}
+          <span class="muted">{srsP.due.length || srsNew ? t('filter.srsCount', { due: srsP.due.length, fresh: srsNew }) : t('filter.srsNothing')}</span>
+        {:else}
+          <span class="muted">{matching.length === 1 ? t('filter.count1') : t('filter.count', { n: matching.length })}</span>
+        {/if}
         <button class="btn primary big" disabled={!matching.length} onclick={start}>{t('filter.start')}</button>
       </div>
     </section>

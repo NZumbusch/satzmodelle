@@ -2,9 +2,12 @@
   import { computeStats, weakest, type Level } from '../lib/stats';
   import { lib, settings, t, go } from '../lib/state.svelte';
   import type { I18nKey } from '../lib/i18n';
+  import { srsPlan } from '../lib/session';
+  import { DEFAULT_FILTER } from '../lib/library';
 
   const s = $derived(computeStats(lib.models, lib.catMap, lib.progress));
   const weak = $derived(weakest(s, 8));
+  const dueToday = $derived(srsPlan(lib.models, lib.catMap, lib.progress, DEFAULT_FILTER).due.length);
   const pct = (x: number | null) => (x === null ? '–' : `${Math.round(x * 100)} %`);
   const num = (x: number | null, d = 1) => (x === null ? '–' : x.toFixed(d).replace('.', settings.lang === 'de' ? ',' : '.'));
   const LEVELS: Level[] = ['secure', 'shaky', 'insecure', 'new'];
@@ -38,6 +41,7 @@
 {:else}
   <div class="stats">
     <section class="tiles" aria-label={t('stats.overview')}>
+      <div class="tile due"><span class="v">{dueToday}</span><span class="k">{t('stats.dueToday')}</span></div>
       <div class="tile"><span class="v">{s.practised}<small> / {s.pieces}</small></span><span class="k">{t('stats.practised')}</span></div>
       <div class="tile"><span class="v">{s.levels.secure}</span><span class="k">{t('stats.secure')}</span></div>
       <div class="tile"><span class="v">{pct(s.successRate)}</span><span class="k">{t('stats.success')}</span></div>
@@ -159,8 +163,10 @@
   .muted { color: var(--muted); }
   .empty { max-width: 560px; margin: 40px auto; text-align: center; }
 
-  .tiles { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; }
-  @media (max-width: 1000px) { .tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  /* 7 tiles: "due today" spans two cells, so every row is full */
+  .tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+  .tile.due { grid-column: span 2; grid-row: span 1; border-color: var(--accent); }
+  .tile.due .v { color: var(--accent); }
   @media (max-width: 520px) { .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   .tile { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; display: flex; flex-direction: column; gap: 2px; }
   .tile .v { font-size: 28px; font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1.15; }
