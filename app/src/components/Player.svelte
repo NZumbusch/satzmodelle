@@ -331,6 +331,9 @@
       <button class="icon" disabled={status !== 'ready'} onclick={() => engine?.seek(engine.position - 5)} aria-label={t('player.back5')}>
         <svg viewBox="0 0 24 24"><path d="M12 5V2L7 6l5 4V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7z" /><text x="12" y="15.5" font-size="6.5" text-anchor="middle" font-weight="700">5</text></svg>
       </button>
+      {#if speed !== 1}
+        <span class="badge key">{Math.round(speed * 100)} %</span>
+      {/if}
       {#if semitones !== 0}
         <span class="badge key">{keyLabel ?? t('player.semitones', { n: (semitones > 0 ? '+' : '') + semitones })}</span>
       {/if}
@@ -338,14 +341,35 @@
         {#if status === 'loading'}{t('player.loading')}{:else}{fmtTime(pos)} / {fmtTime(engine?.duration ?? 0)}{/if}
         {#if playState === 'counting'}<span class="counting">●</span>{/if}
       </div>
-      {#if !compact}
         <div class="opts" bind:this={optsEl}>
-          <button class="icon optbtn" class:on={optsOpen || countIn > 0 || volume !== 1} onclick={() => (optsOpen = !optsOpen)}
+          <button class="icon optbtn" class:on={optsOpen || speed !== 1 || semitones !== 0 || countIn > 0 || volume !== 1} onclick={() => (optsOpen = !optsOpen)}
             aria-expanded={optsOpen} aria-haspopup="true" aria-label={t('player.options')} title={t('player.options')}>
             <svg viewBox="0 0 24 24"><path d="M4 7h9.2a2.5 2.5 0 0 0 4.6 0H20v-2h-2.2a2.5 2.5 0 0 0-4.6 0H4zm0 12h3.2a2.5 2.5 0 0 0 4.6 0H20v-2h-8.2a2.5 2.5 0 0 0-4.6 0H4zm0-6h9.2a2.5 2.5 0 0 0 4.6 0H20v-2h-2.2a2.5 2.5 0 0 0-4.6 0H4z" /></svg>
           </button>
           {#if optsOpen}
             <div class="panel" role="dialog" aria-label={t('player.options')}>
+              <div class="prow">
+                <span class="phead">{t('player.speed')}
+                  {#if speed !== 1}<button class="linkbtn" onclick={() => setSpeed(1)}>{t('player.reset')}</button>{/if}</span>
+                <div class="stepper">
+                  <button class="chip" onclick={() => setSpeed(speed - 0.05)} aria-label={t('player.slower')}>−</button>
+                  <select value={speeds.includes(speed) ? speed : ''} aria-label={t('player.speed')}
+                    onchange={(e) => setSpeed(Number((e.target as HTMLSelectElement).value))}>
+                    {#if !speeds.includes(speed)}<option value="">{Math.round(speed * 100)} %</option>{/if}
+                    {#each speeds as sp}<option value={sp}>{Math.round(sp * 100)} %</option>{/each}
+                  </select>
+                  <button class="chip" onclick={() => setSpeed(speed + 0.05)} aria-label={t('player.faster')}>+</button>
+                </div>
+              </div>
+              <div class="prow">
+                <span class="phead">{t('player.transpose')}
+                  {#if semitones !== 0}<button class="linkbtn" onclick={() => setSemis(0)}>{t('player.reset')}</button>{/if}</span>
+                <div class="stepper">
+                  <button class="chip" onclick={() => setSemis(semitones - 1)} aria-label={t('player.down')}>−</button>
+                  <span class="val">{semitones > 0 ? '+' : ''}{semitones}{#if keyLabel}&nbsp;·&nbsp;<span class="kl">{keyLabel}</span>{/if}</span>
+                  <button class="chip" onclick={() => setSemis(semitones + 1)} aria-label={t('player.up')}>+</button>
+                </div>
+              </div>
               <label class="prow">
                 <span>{t('player.countIn')}</span>
                 <select bind:value={countIn}>
@@ -360,7 +384,6 @@
             </div>
           {/if}
         </div>
-      {/if}
     </div>
 
     <canvas bind:this={canvas} class="wave" class:editing onpointerdown={onWavePointer} onpointermove={onWaveMove}></canvas>
@@ -387,45 +410,13 @@
           </span>
         {/each}
         {#if editing}<span class="muted small">{t('marker.edit.hint')}</span>{/if}
+        {#if markers.length && !editing}
+          <button class="chip loop" class:on={sectionLoop} onclick={toggleSectionLoop} aria-pressed={sectionLoop}
+            title={t('marker.section.desc')}>⟲ {t('marker.section')}</button>
+        {/if}
       </div>
     {/if}
 
-    <div class="controls">
-      {#if markers.length}
-        <div class="ctl">
-          <span class="lbl">{t('marker.section')}</span>
-          <div class="row">
-            <button class="chip" class:on={sectionLoop} onclick={toggleSectionLoop} aria-pressed={sectionLoop}
-              title={t('marker.section.desc')}>⟲ {sectionLoop ? t('player.allOn') : t('player.allOff')}</button>
-          </div>
-        </div>
-      {/if}
-
-      <div class="ctl">
-        <span class="lbl">{t('player.speed')} <b>{Math.round(speed * 100)} %</b></span>
-        <div class="row">
-          <button class="chip" onclick={() => setSpeed(speed - 0.05)} aria-label="−">−</button>
-          <select value={speeds.includes(speed) ? speed : ''} onchange={(e) => setSpeed(Number((e.target as HTMLSelectElement).value))}>
-            {#if !speeds.includes(speed)}<option value="">{Math.round(speed * 100)} %</option>{/if}
-            {#each speeds as s}<option value={s}>{Math.round(s * 100)} %</option>{/each}
-          </select>
-          <button class="chip" onclick={() => setSpeed(speed + 0.05)} aria-label="+">+</button>
-        </div>
-      </div>
-
-      {#if !compact}
-
-        <div class="ctl">
-          <span class="lbl">{t('player.transpose')} <b>{semitones > 0 ? '+' : ''}{semitones}</b>{#if keyLabel}<b class="kl">{keyLabel}</b>{/if}</span>
-          <div class="row">
-            <button class="chip" onclick={() => { setSemis(semitones - 1); }} aria-label="−">−</button>
-            <button class="chip" onclick={() => { setSemis(0); }}>{t('player.reset')}</button>
-            <button class="chip" onclick={() => { setSemis(semitones + 1); }} aria-label="+">+</button>
-          </div>
-        </div>
-
-      {/if}
-    </div>
   {/if}
 </div>
 
@@ -451,24 +442,25 @@
   .del { min-width: 32px; padding: 0 8px; }
   .add { border-color: var(--accent); color: var(--accent); }
   .small { font-size: 13px; }
-  .controls { display: flex; flex-wrap: wrap; gap: 14px 28px; align-items: flex-end; }
-  .ctl { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
-  .lbl { font-size: 13px; color: var(--muted); }
-  .lbl b { color: var(--text); font-weight: 600; margin-left: 4px; }
-  .lbl .kl { color: var(--accent); }
-  .row { display: flex; gap: 6px; align-items: center; flex-wrap: nowrap; }
   .muted { color: var(--muted); }
   /* rarely used options (count-in, volume) live in a small panel under the sliders icon */
   .opts { position: relative; }
   .optbtn { background: none; color: var(--muted); }
   .optbtn.on { color: var(--accent); background: var(--surface-2); }
   .panel {
-    position: absolute; right: 0; top: calc(100% + 8px); z-index: 30; width: 260px;
+    position: absolute; right: 0; top: calc(100% + 8px); z-index: 30; width: 300px; max-width: calc(100vw - 48px);
     display: flex; flex-direction: column; gap: 14px; padding: 14px 16px;
     background: var(--surface); border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 8px 24px var(--shadow);
   }
   .prow { display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: var(--muted); }
   .prow b { color: var(--text); font-weight: 600; margin-left: 4px; }
-  .prow select { align-self: flex-start; }
+  .prow select { align-self: stretch; }
   .prow input { width: 100%; min-height: 32px; }
+  .phead { display: flex; justify-content: space-between; align-items: center; min-height: 24px; }
+  .stepper { display: flex; align-items: center; gap: 6px; }
+  .stepper select { flex: 1; }
+  .val { flex: 1; min-width: 92px; text-align: center; color: var(--text); font-size: 15px; font-variant-numeric: tabular-nums; }
+  .kl { color: var(--accent); }
+  .linkbtn { border: 0; background: none; color: var(--accent); font: inherit; font-size: 13px; padding: 2px 0; cursor: pointer; }
+  .loop { margin-left: auto; }
 </style>

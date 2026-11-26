@@ -19,8 +19,12 @@ follow from that and from feedback while using it on a tablet.
 - **Markers instead of an A–B loop.** You listen, tap where sections start, name them, and practise
   section by section. "Abschnitt wiederholen" loops the current section until you pause.
 - **No repeat counts, no automatic key cycling.** Both were tried and removed: pressing play again is
-  simpler, and transposing by hand is enough. The interface stays minimal; count-in and volume sit
-  behind "Mehr …".
+  simpler, and transposing by hand is enough.
+- **A minimal player.** Visible are only transport, waveform and markers. Tempo, transposition, count-in
+  and volume live in one options panel (sliders icon next to the time); while something differs from the
+  default the icon is highlighted and small badges show tempo and key.
+- **The hint bar never changes shape.** "Next hint", the confirmation before the solution and "all
+  revealed" are the same box with different content; the rating buttons share the width evenly.
 - **Speed keeps the pitch, transposition keeps the speed.** For MusicXML the app re-renders in the new
   key (exact); recordings are pitch-shifted.
 

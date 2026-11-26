@@ -165,28 +165,32 @@
     {/key}
 
     <section class="card actions">
+      <!-- one box whose content changes: next hint -> confirmation -> all revealed -->
       {#if confirming}
-        <div class="confirm">
-          <span>{t('practice.confirmReveal')}</span>
-          <button class="btn primary" onclick={reveal}>{t('common.yes')}</button>
-          <button class="btn" onclick={() => (confirming = null)}>{t('common.no')}</button>
+        <div class="slot confirm" role="alertdialog" aria-label={t('practice.confirmReveal')}>
+          <span class="txt">{t('practice.confirmReveal')}</span>
+          <span class="cbtns">
+            <button class="btn" onclick={() => (confirming = null)}>{t('common.no')}</button>
+            <button class="btn primary" onclick={reveal}>{t('common.yes')}</button>
+          </span>
         </div>
       {:else if nextStep}
-        <button class="btn hint" onclick={reveal}>
-          {t('practice.nextHint', { step: stepName(nextStep.id) })}
+        <button class="slot hint" onclick={reveal}>
+          <span class="txt">{t('practice.nextHint', { step: stepName(nextStep.id) })}</span>
           <span class="steps">{revealed}/{ladder.length}</span>
         </button>
       {:else}
-        <p class="muted small">{t('practice.noMoreHints')}</p>
+        <div class="slot done">
+          <span class="txt">✓ {t('practice.noMoreHints')}</span>
+          <span class="steps">{ladder.length}/{ladder.length}</span>
+        </div>
       {/if}
 
       <div class="rate" role="group" aria-label={t('practice.rate')}>
-        <div class="row">
-          <button class="btn yes" onclick={() => rate('yes')}>{t('practice.rate.yes')}</button>
-          <button class="btn partly" onclick={() => rate('partly')}>{t('practice.rate.partly')}</button>
-          <button class="btn no" onclick={() => rate('no')}>{t('practice.rate.no')}</button>
-          <button class="btn ghost" onclick={next}>{t('practice.skip')}</button>
-        </div>
+        <button class="btn yes" onclick={() => rate('yes')}>{t('practice.rate.yes')}</button>
+        <button class="btn partly" onclick={() => rate('partly')}>{t('practice.rate.partly')}</button>
+        <button class="btn no" onclick={() => rate('no')}>{t('practice.rate.no')}</button>
+        <button class="btn ghost" onclick={next}>{t('practice.skip')}</button>
       </div>
     </section>
   </div>
@@ -205,22 +209,34 @@
   .facts { display: grid; grid-template-columns: max-content 1fr; gap: 4px 16px; margin: 0 0 12px; }
   .facts dt { color: var(--muted); }
   .facts dd { margin: 0; font-weight: 500; }
-  .actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; padding: 12px 16px; }
+  .actions { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px 14px; align-items: center; padding: 12px 16px; }
   @media (min-height: 700px) and (min-width: 601px) {
     .actions { position: sticky; bottom: 0; z-index: 5; box-shadow: 0 -6px 18px var(--shadow); }
   }
-  .actions > .btn.hint, .actions > p, .actions > .confirm { flex: 1 1 280px; }
-  .hint { justify-content: space-between; }
-  .steps { color: var(--muted); font-size: 13px; }
-  .rate { flex: 0 1 auto; }
-  .confirm { display: flex; flex-wrap: wrap; gap: 8px 10px; align-items: center; }
-  .actions > p { margin: 0; }
+  .slot {
+    box-sizing: border-box; width: 100%; min-height: 48px; display: flex; align-items: center; justify-content: space-between;
+    gap: 10px; padding: 4px 6px 4px 16px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface-2);
+    color: var(--text); font: inherit; font-weight: 500; text-align: left;
+  }
+  button.slot { cursor: pointer; padding-right: 16px; }
+  .slot .txt { min-width: 0; }
+  .steps { color: var(--muted); font-size: 13px; font-weight: 400; flex: none; }
+  .done { color: var(--muted); padding-right: 16px; }
+  .confirm { border-color: var(--accent); background: var(--surface); }
+  .cbtns { display: flex; gap: 6px; flex: none; }
+  .cbtns .btn { min-height: 38px; padding: 0 16px; }
+  .rate { display: flex; gap: 8px; }
+  /* narrower screens: hint box on its own row, rating buttons share the full width evenly */
+  @media (max-width: 1000px) {
+    .actions { grid-template-columns: 1fr; }
+    .rate { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .rate .btn { padding: 0 6px; }
+  }
+  @media (max-width: 480px) {
+    .rate { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
   .row { display: flex; flex-wrap: wrap; gap: 8px; }
   .center { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px; }
   .small { font-size: 13px; margin: 0 0 8px; }
   .muted { color: var(--muted); }
-  @media (max-width: 600px) {
-    .rate { flex: 1 1 100%; }
-    .rate .btn { flex: 1 1 40%; }
-  }
 </style>

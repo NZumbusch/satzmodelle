@@ -36,7 +36,7 @@ const sizes = (process.argv[4] || '1280x800,800x1280,962x601,601x962,1180x820,82
     await p.locator('.task').getByRole('button', { name: /Marker setzen/ }).click();
     await shot('2practice-top');
     for (let i = 0; i < 8; i++) {
-      const hint = p.locator('.btn.hint'); if (!(await hint.count())) break;
+      const hint = p.locator('.slot.hint'); if (!(await hint.count())) break;
       await hint.click(); const yes = p.getByRole('button', { name: 'Ja' }); if (await yes.count()) await yes.click();
       await p.waitForTimeout(200);
     }
